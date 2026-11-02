@@ -124,6 +124,11 @@ body.step #next{flex:1 1 200px;justify-content:center;font-size:24px;padding:18p
 .score h2,.tips h2{font-size:20px;margin-bottom:8px}
 .line-lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:10px 0 6px}
 .bars{display:grid;grid-template-columns:repeat(var(--cols,4),1fr);gap:8px}
+.chip.multi .cn{font-size:13px;gap:2px}
+.chip.multi small{font-size:9px}
+.cls{display:flex;gap:1px}
+.wk.target.hit::before{display:none}
+.wk.target.hit{box-shadow:inset 0 -60px 40px -30px var(--ok)}
 .chip.rest .cn{background:var(--line);color:var(--muted);font-size:13px;opacity:1}
 @media (max-width:640px){.bars{grid-template-columns:repeat(2,1fr)}}
 .bar{border:1.5px solid var(--line);border-radius:14px;padding:8px 6px 6px;min-width:0}
@@ -235,8 +240,32 @@ body.step #next{flex:1 1 200px;justify-content:center;font-size:24px;padding:18p
 
 <script>
 const N=(n,b,h,f,w,bar)=>({n,b,h,f,w,bar});
-const R=(b,bar)=>({n:null,b,w:'',bar});
+const R=(b,bar,w='')=>({n:null,b,w,bar});
+const K=(keys,b,w,bar)=>({n:keys[0][0],keys:keys.map(([n,h,f])=>({n,h,f})),b,w,bar});
+const LC=[['A3','L',3],['C4','L',1]], LF=[['F3','L',3],['A3','L',1]], B7=[['B3','L',2],['D4','R',2],['E4','R',3]];
 const PIECES=[
+ {id:'tango',number:55,title:'Tango',mark:'Rhythmically',time:'4/4',position:'Middle C position',bpm:70,staccato:true,wordLabel:'Count',
+  lines:[{label:'Line 1',bars:[1,2,3,4]},{label:'Line 2',bars:[5,6,7,8]}],
+  notes:[
+   K(LC,1,'1',1),K(LC,1,'2',1),R(1,1,'3'),K(LC,1,'4',1),
+   K(LC,1,'1',2),R(1,2,'2'),N('E4',1,'R',3,'3',2),R(1,2,'4'),
+   K(LF,1,'1',3),K(LF,1,'2',3),R(1,3,'3'),K(LF,1,'4',3),
+   K(LF,1,'1',4),R(1,4,'2'),N('D4',1,'R',2,'3',4),R(1,4,'4'),
+   K(LF,1,'1',5),K(LF,1,'2',5),R(1,5,'3'),K(LF,1,'4',5),
+   K(LF,1,'1',6),R(1,6,'2'),N('C4',1,'R',1,'3',6),R(1,6,'4'),
+   K(B7,1,'1',7),K(B7,1,'2',7),R(1,7,'3'),K(B7,1,'4',7),
+   K([['A3','L',3],['C4','R',1],['E4','R',3]],1,'1',8),R(3,8,'2 3 4')
+  ],
+  tips:[
+   '<b>Tango is a dance for two people</b> from Argentina and Uruguay. It sounds sharp and jumpy, like dancers stepping and stopping.',
+   '<b>Play 2 keys at the same time.</b> Most notes here are pairs of keys. Press both together, as if they were one key. In the app, tap both keys (one after the other is fine) to move on.',
+   '<b>Every note is short and strong.</b> The dot means staccato: bounce off the key quickly. The &gt; means accent: play it a bit louder.',
+   '<b>The rests are part of the dance.</b> Your teacher boxed them in pencil. Keep counting "1 2 3 4" out loud, and stay silent on the rests. Silence on beat 3 is what makes it sound like a tango.',
+   '<b>Bars 1 and 2:</b> left hand plays A and C together (fingers 3 and 1). The right hand answers with one E (finger 3) on beat 3.',
+   '<b>Bar 3: the left hand moves down.</b> The pink circle in the book means a new hand position. Thumb on A, finger 3 on F. Use the rest at the end of bar 2 to move.',
+   '<b>Bar 7: both hands play together.</b> Right hand D and E (fingers 2 and 3), left hand B (finger 2). Your left thumb is back on Middle C.',
+   '<b>The last note is three keys:</b> right hand C and E, left hand A. Then three beats of silence. Freeze like a dancer at the end!'
+  ]},
  {id:'sailor-went-to-sea',number:53,title:'A Sailor Went to Sea',mark:'Quite fast',time:'4/4',position:'Middle C position',bpm:80,
   lines:[{label:'Line 1',bars:[1,2,3,4,5]},{label:'Line 2',bars:[6,7,8,9]}],
   notes:[
@@ -293,9 +322,15 @@ const freq=n=>440*Math.pow(2,(midi(n)-69)/12);
 const wIdx=n=>{const p=parse(n);return p.o*7+LETTERS.indexOf(p.l)};
 const wName=i=>LETTERS[i%7]+Math.floor(i/7);
 const col=l=>`var(--c-${l})`;
+const byPitch=ks=>[...ks].sort((a,b)=>midi(a.n)-midi(b.n));
+const fill=ks=>{const c=byPitch(ks).map(k=>col(k.n[0]));if(c.length===1)return c[0];const st=100/c.length;return `linear-gradient(90deg,${c.map((x,i)=>`${x} ${i*st}% ${(i+1)*st}%`).join(',')})`};
+const stepDur=(n,spb)=>piece.staccato?.32:n.b*spb/1000+.35;
+function playStep(n,dur){const v=.32/Math.sqrt(n.keys.length);n.keys.forEach(k=>tone(freq(k.n),dur,v))}
+function describe(ks){const out=[];for(const h of ['R','L']){const f=byPitch(ks).filter(k=>k.h===h).map(k=>k.f);if(f.length)out.push(`${h==='L'?'Left':'Right'} hand, finger${f.length>1?'s':''} ${f.join(' + ')}`)}
+ return out.length>1?out.join(' and ').replace(' and Left',' and left'):out[0]}
 const $=id=>document.getElementById(id);
 
-let stepMode=false,piece=PIECES[0],idx=0,mode='letter',bpm=66,timers=[],running=null,audio;
+let got=new Set(),stepMode=false,piece=PIECES[0],idx=0,mode='letter',bpm=66,timers=[],running=null,audio;
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* sound */
@@ -325,10 +360,10 @@ function click(accent){const c=ac();if(!c)return;const t=c.currentTime,o=c.creat
 
 /* hands */
 const FING={1:{x:4,y:50,w:20,h:36,r:-28},2:{x:30,y:14,w:19,h:52,r:0},3:{x:52,y:6,w:19,h:58,r:0},4:{x:74,y:14,w:19,h:52,r:0},5:{x:95,y:30,w:17,h:42,r:0}};
-function handSVG(side,active,color){
+function handSVG(side,act){
  let s=`<svg viewBox="0 0 120 108" aria-hidden="true"><rect class="palm" x="${side==='R'?28:6}" y="50" width="86" height="54" rx="20"/>`;
  for(const k of [1,2,3,4,5]){const f=FING[k];const x=side==='R'?f.x:120-f.x-f.w;const r=side==='R'?f.r:-f.r;
-  const cx=x+f.w/2,cy=f.y+f.h/2,on=+k===active;
+  const cx=x+f.w/2,cy=f.y+f.h/2,on=!!act[k],color=act[k];
   s+=`<g transform="rotate(${r} ${cx} ${cy})"><rect class="fing" x="${x}" y="${f.y}" width="${f.w}" height="${f.h}" rx="${f.w/2}" ${on?`style="fill:${color};stroke:${color}"`:''}/>`+
      `<text class="fnum${on?' on':''}" x="${cx}" y="${f.y+16}">${k}</text></g>`}
  return s+'</svg>'}
@@ -336,15 +371,13 @@ function handSVG(side,active,color){
 /* keyboard */
 let fingerMap={};
 function buildKeyboard(){
- const ws=piece.notes.filter(n=>n.n).map(n=>wIdx(n.n));let lo=Math.min(...ws)-2,hi=Math.max(...ws)+2;
+ const ws=piece.notes.filter(n=>n.n).flatMap(n=>n.keys.map(k=>wIdx(k.n)));let lo=Math.min(...ws)-2,hi=Math.max(...ws)+2;
  while(hi-lo+1<12){lo--;if(hi-lo+1<12)hi++}
- fingerMap={};piece.notes.forEach(n=>{if(n.n&&!fingerMap[n.n])fingerMap[n.n]=n.h+n.f});
  const kb=$('kb');kb.innerHTML='';const count=hi-lo+1;
  for(let i=lo;i<=hi;i++){const name=wName(i),l=name[0];
   const b=document.createElement('button');b.className='wk';b.dataset.note=name;b.style.setProperty('--tc',col(l));
   b.setAttribute('aria-label',name);
-  const fm=fingerMap[name];
-  b.innerHTML=`${fm?`<span class="gf">${fm[1]}</span>`:''}<span class="lbl" style="background:${col(l)}" data-l="${l}">${l}</span>${name==='C4'?'<span class="mc">Middle C</span>':''}`;
+  b.innerHTML=`<span class="gf"></span><span class="lbl" style="background:${col(l)}" data-l="${l}">${l}</span>${name==='C4'?'<span class="mc">Middle C</span>':''}`;
   kb.appendChild(b)}
  for(let i=lo;i<hi;i++){const l=LETTERS[i%7];if('CDFGA'.includes(l)){const name=l+'#'+Math.floor(i/7);
   const b=document.createElement('button');b.className='bk';b.dataset.note=name;b.setAttribute('aria-label',name);
@@ -355,7 +388,8 @@ function applyLabels(){document.querySelectorAll('.lbl').forEach(s=>{const l=s.d
 
 function pressKey(b){const name=b.dataset.note;tone(freq(name));b.classList.add('down');setTimeout(()=>b.classList.remove('down'),180);
  if(running)return;const cur=piece.notes[idx];
- if(name===cur.n){advance()}else if(b.classList.contains('wk')){b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');setTimeout(()=>b.classList.remove('wrong'),400)}}
+ const want=cur.keys.map(k=>k.n);
+ if(want.includes(name)){got.add(name);b.classList.add('hit');if(want.every(x=>got.has(x)))setTimeout(advance,want.length>1?150:0)}else if(b.classList.contains('wk')){b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');setTimeout(()=>b.classList.remove('wrong'),400)}}
 
 /* score */
 function buildScore(){const el=$('score');el.innerHTML='';
@@ -364,24 +398,27 @@ function buildScore(){const el=$('score');el.innerHTML='';
   line.bars.forEach(bn=>{const bar=document.createElement('div');bar.className='bar';bar.dataset.bar=bn;
    let h=`<div class="barno">Bar ${bn}</div><div class="beatsrow">`;
    piece.notes.forEach((n,i)=>{if(n.bar!==bn)return;
-    if(!n.n){h+=`<div class="chip rest" style="grid-column:span ${n.b}" aria-label="rest, ${n.b} beats"><span class="cn">rest</span><span class="cw">&nbsp;</span></div>`;return}
-    const l=n.n[0];
-    h+=`<button class="chip${n.b>1?' half':''}" data-i="${i}" style="grid-column:span ${n.b}" aria-label="${n.n}, ${n.h==='L'?'left':'right'} hand finger ${n.f}"><span class="cn" style="background:${col(l)}"><span class="cl" data-l="${l}">${l}</span><small>${n.h}${n.f}</small></span><span class="cw">${n.w}</span></button>`});
+    if(!n.n){h+=`<div class="chip rest" style="grid-column:span ${n.b}" aria-label="rest, ${n.b} beats"><span class="cn">rest</span><span class="cw">${n.w||'&nbsp;'}</span></div>`;return}
+    const ks=byPitch(n.keys),multi=ks.length>1;
+    const fg=['L','R'].map(hh=>{const f=ks.filter(k=>k.h===hh).map(k=>k.f);return f.length?hh+f.join(''):''}).filter(Boolean).join(' ');
+    h+=`<button class="chip${n.b>1?' half':''}${multi?' multi':''}" data-i="${i}" style="grid-column:span ${n.b}" aria-label="${ks.map(k=>k.n).join(' and ')}, ${describe(ks)}"><span class="cn" style="background:${fill(ks)}"><span class="cls">${ks.map(k=>`<span class="cl" data-l="${k.n[0]}">${k.n[0]}</span>`).join('')}</span><small>${fg}</small></span><span class="cw">${n.w}</span></button>`});
    bar.innerHTML=h+'</div>';bars.appendChild(bar)});
   el.appendChild(bars)});
- el.querySelectorAll('.chip[data-i]').forEach(c=>c.addEventListener('click',()=>{if(running)stop();idx=+c.dataset.i;update();tone(freq(piece.notes[idx].n))}));
+ el.querySelectorAll('.chip[data-i]').forEach(c=>c.addEventListener('click',()=>{if(running)stop();idx=+c.dataset.i;update();sayCur()}));
  applyChipLabels()}
 function applyChipLabels(){document.querySelectorAll('.cl').forEach(s=>s.textContent=mode==='solfa'?SOLFA[s.dataset.l]:s.dataset.l)}
 
 /* update view */
-function update(){const n=piece.notes[idx],l=n.n[0];
- $('bubble').textContent=l;$('bubble').style.background=col(l);
- $('nSolfa').textContent=SOLFA[l];
- $('nWhich').textContent=`${n.h==='L'?'Left':'Right'} hand, finger ${n.f}`;
- $('nSing').innerHTML=`Sing: <b>${n.w}</b>`;
+function update(){const n=piece.notes[idx],ks=byPitch(n.keys),ls=ks.map(k=>k.n[0]);
+ got=new Set();document.querySelectorAll('.wk.hit').forEach(k=>k.classList.remove('hit'));
+ $('bubble').textContent=ls.join(' ');$('bubble').style.background=fill(ks);$('bubble').style.fontSize=ls.length>2?'26px':ls.length>1?'38px':'';
+ $('nSolfa').textContent=ls.map(l=>SOLFA[l]).join(' + ')+(ls.length>1?'  (together)':'');
+ $('nWhich').textContent=describe(ks);
+ $('nSing').hidden=!n.w;$('nSing').innerHTML=`${piece.wordLabel||'Sing'}: <b>${n.w}</b>`;
  $('nBeats').innerHTML=Array.from({length:n.b},()=>'<span class="beat-dot"></span>').join('')+(n.b>1?` Hold for ${n.b} beats`:' 1 beat');
- $('hands').innerHTML=['L','R'].map(s=>`<div class="hand${n.h===s?'':' off'}">${handSVG(s,n.h===s?n.f:0,col(l))}${s==='L'?'Left':'Right'}</div>`).join('');
- document.querySelectorAll('.wk').forEach(k=>k.classList.toggle('target',k.dataset.note===n.n));
+ $('hands').innerHTML=['L','R'].map(s=>{const act={};ks.filter(k=>k.h===s).forEach(k=>act[k.f]=col(k.n[0]));
+  return `<div class="hand${Object.keys(act).length?'':' off'}">${handSVG(s,act)}${s==='L'?'Left':'Right'}</div>`}).join('');
+ document.querySelectorAll('.wk').forEach(k=>{const t=ks.find(x=>x.n===k.dataset.note);k.classList.toggle('target',!!t);const g=k.querySelector('.gf');if(g)g.textContent=t?t.f:''});
  const tk=document.querySelector('.wk.target');
  document.querySelectorAll('.chip').forEach(c=>{const i=+c.dataset.i;c.classList.toggle('cur',i===idx);c.classList.toggle('done',i<idx)});
  document.querySelectorAll('.bar').forEach(b=>b.classList.toggle('cur',+b.dataset.bar===n.bar));
@@ -407,12 +444,12 @@ async function run(kind){if(running){const was=running;stop();if(was===kind)retu
  (kind==='listen'?$('listen'):$('along')).textContent='■ Stop';
  if(kind==='along'){for(let i=0;i<3;i++){timers.push(setTimeout(()=>{click(i===2);$('count').hidden=false;$('count').textContent=3-i},t));t+=1000}
   timers.push(setTimeout(()=>{$('count').hidden=true},t))}
- let beat=0;piece.notes.forEach((n,i)=>{if(n.n)timers.push(setTimeout(()=>{idx=i;update();if(kind==='listen')tone(freq(n.n),n.b*spb/1000+.35)},t+beat*spb));beat+=n.b});
+ let beat=0;piece.notes.forEach((n,i)=>{if(n.n)timers.push(setTimeout(()=>{idx=i;update();if(kind==='listen')playStep(n,stepDur(n,spb))},t+beat*spb));beat+=n.b});
  if(kind==='along'){for(let b=0;b<beat;b++)timers.push(setTimeout(()=>click(b%4===0),t+b*spb))}
  timers.push(setTimeout(()=>{stop();idx=firstPlay();update()},t+beat*spb+400))}
 
 /* wiring */
-function sayCur(){const n=piece.notes[idx];if(n&&n.n)tone(freq(n.n),Math.min(1.8,n.b*.7+.5))}
+function sayCur(){const n=piece.notes[idx];if(n&&n.n)playStep(n,piece.staccato?.4:Math.min(1.8,n.b*.7+.5))}
 $('next').onclick=()=>{if(running)stop();if(stepMode){const last=nextPlay(idx)<0;advance();if(!last)sayCur()}else{sayCur();advance()}};
 $('back').onclick=()=>{if(running)stop();const j=prevPlay(idx);if(j>=0){idx=j;update();if(stepMode)sayCur()}};
 $('hear').onclick=()=>{if(running)stop();sayCur()};
@@ -440,6 +477,7 @@ function loadPiece(p){stop();piece=p;idx=firstPlay();store.set('pianoSteps.piece
  $('tips').innerHTML=p.tips.map(t=>`<li>${t}</li>`).join('');
  buildKeyboard();buildScore();showStars();update()}
 
+PIECES.forEach(p=>p.notes.forEach(n=>{if(n.n&&!n.keys)n.keys=[{n:n.n,h:n.h,f:n.f}]}));
 PIECES.sort((a,b)=>a.number-b.number);
 function buildShelf(){const el=$('shelf');
  el.innerHTML=PIECES.map((p,i)=>{const s=store.get('pianoSteps.stars.'+p.id,0);
