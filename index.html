@@ -239,6 +239,7 @@ body.step #next{flex:1 1 200px;justify-content:center;font-size:24px;padding:18p
 </div>
 
 <script>
+/*SONGS-START: built-in copy, used offline. The live list comes from songs.json */
 const N=(n,b,h,f,w,bar)=>({n,b,h,f,w,bar});
 const R=(b,bar,w='')=>({n:null,b,w,bar});
 const K=(keys,b,w,bar)=>({n:keys[0][0],keys:keys.map(([n,h,f])=>({n,h,f})),b,w,bar});
@@ -312,6 +313,7 @@ const PIECES=[
    '<b>"Smoothly" means legato.</b> Let each key come up just as the next one goes down. No gaps, no bumps.'
   ]}
 ];
+/*SONGS-END*/
 
 const LETTERS=['C','D','E','F','G','A','B'];
 const SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -477,15 +479,32 @@ function loadPiece(p){stop();piece=p;idx=firstPlay();store.set('pianoSteps.piece
  $('tips').innerHTML=p.tips.map(t=>`<li>${t}</li>`).join('');
  buildKeyboard();buildScore();showStars();update()}
 
-PIECES.forEach(p=>p.notes.forEach(n=>{if(n.n&&!n.keys)n.keys=[{n:n.n,h:n.h,f:n.f}]}));
-PIECES.sort((a,b)=>a.number-b.number);
-function buildShelf(){const el=$('shelf');
+function prepSongs(){PIECES.forEach(p=>p.notes.forEach(n=>{if(n.n&&!n.keys)n.keys=[{n:n.n,h:n.h,f:n.f}]}));PIECES.sort((a,b)=>a.number-b.number)}
+prepSongs();
+/* Fetch the latest songs on every open, so a home-screen shortcut picks up new songs without being re-added. */
+let songsSig='';
+async function refreshSongs(){
+ try{
+  const r=await fetch('songs.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+  const txt=await r.text();if(txt===songsSig)return;const d=JSON.parse(txt);
+  if(!d||!Array.isArray(d.pieces)||!d.pieces.length||!d.pieces.every(p=>p.id&&Array.isArray(p.notes)))return;
+  songsSig=txt;
+  const curId=piece.id,keep=idx;
+  PIECES.splice(0,PIECES.length,...d.pieces);prepSongs();
+  if(running){piece=PIECES.find(x=>x.id===curId)||piece;buildShelf();return}
+  const p=PIECES.find(x=>x.id===curId)||PIECES[0];
+  loadPiece(p);if(p.id===curId&&keep<p.notes.length&&p.notes[keep].n){idx=keep;update()}
+ }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshSongs()});
+function buildShelf(){const el=$('shelf');$('libTitle').textContent=`My songs (${PIECES.length})`;
  el.innerHTML=PIECES.map((p,i)=>{const s=store.get('pianoSteps.stars.'+p.id,0);
   return `<button class="song" data-i="${i}" aria-current="${p===piece}"><span class="sn">${p.number}</span><span class="sx"><span class="st">${p.title}</span><span class="ss">${s?'★ '+s+' · ':''}${p.notes.filter(n=>n.n).length} notes</span></span></button>`}).join('');
  el.querySelectorAll('.song').forEach(b=>b.onclick=()=>{const p=PIECES[+b.dataset.i];if(p!==piece){loadPiece(p);if(stepMode)setStep(true,true)}})}
 mode=store.get('pianoSteps.mode','letter');
 const lastId=store.get('pianoSteps.piece',PIECES[0].id);const startI=Math.max(0,PIECES.findIndex(p=>p.id===lastId));
 loadPiece(PIECES[startI]);setMode(mode);setStep(store.get('pianoSteps.step',false),false);
+refreshSongs();
 </script>
 
 </body>
