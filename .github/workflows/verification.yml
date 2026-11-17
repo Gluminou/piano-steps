@@ -1,0 +1,56 @@
+name: Vérification
+
+# Pourquoi ce fichier existe.
+#
+# Le 10 novembre 2026, dans le dépôt carnet-recettes, le format des données
+# a changé et le script qui fabrique les fichiers générés a été modifié en
+# conséquence, mais la version corrigée est restée hors du dépôt. Pendant
+# sept jours le dépôt a contenu un produit fini correct et une recette de
+# fabrication périmée, sans que rien ne le signale, parce que personne
+# n'exécutait jamais la copie commitée. Ce workflow l'exécute à chaque push.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # songs.json est extrait de la liste de morceaux écrite dans
+      # index.html par build-songs.js, qui vérifie au passage que chaque
+      # mesure fait bien quatre temps. On le refabrique et on compare, en
+      # ignorant la date de mise à jour qui change toute seule.
+      - name: songs.json correspond-il toujours à index.html
+        run: |
+          node build-songs.js index.html /tmp/songs.neuf.json
+          node -e '
+            const fs = require("fs");
+            const a = JSON.parse(fs.readFileSync("songs.json", "utf8"));
+            const b = JSON.parse(fs.readFileSync("/tmp/songs.neuf.json", "utf8"));
+            delete a.updated; delete b.updated;
+            if (JSON.stringify(a) !== JSON.stringify(b)) {
+              console.error("songs.json ne correspond plus à index.html : relancez \"node build-songs.js\" et commitez le résultat.");
+              process.exit(1);
+            }
+            console.log("songs.json correspond à index.html (" + b.count + " morceaux).");
+          '
+
+      - name: Installer le navigateur
+        run: |
+          npm install --no-save 'playwright@^1'
+          npx playwright install --with-deps chromium
+
+      # Syntaxe de tous les .js et .json, concordance entre la version
+      # embarquée et version.json, puis chargement réel de index.html dans
+      # Chromium : toute exception JavaScript ou tout fichier du dépôt
+      # introuvable fait échouer le run.
+      - name: Syntaxe, versions, chargement et fichiers manquants
+        run: node .github/verify.mjs .
