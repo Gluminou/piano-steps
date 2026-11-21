@@ -15,3 +15,13 @@ The header shows "My songs (N)". When a new song is added, that number goes up o
 1. Add the piece to the list between `/*SONGS-START` and `/*SONGS-END*/` in `index.html`.
 2. Run `node build-songs.js` to rebuild `songs.json`. It also checks that every bar adds up to 4 beats.
 3. Commit both files.
+
+## Versions
+
+The app shows its version number and date at the bottom, with a **Check for update** button and a **What's new** list. Release each change with:
+
+```
+node tools/release.mjs patch "What changed, in plain words"
+```
+
+`patch` for a fix, `minor` for something new on screen, `major` for a rework. The script keeps the page, `version.json` and `changelog.json` in step. The update section itself is `updates.js`, shared by all the apps.
