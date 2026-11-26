@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.0",
+    "date": "2026-11-26",
+    "notes": [
+      "Sync between devices: once a GitHub key is entered, stars, tempos and settings follow you between the iPad, the phone and the computer."
+    ]
+  },
+  {
     "version": "1.0.0",
     "date": "2026-11-21",
     "notes": [

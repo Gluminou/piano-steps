@@ -25,3 +25,9 @@ node tools/release.mjs patch "What changed, in plain words"
 ```
 
 `patch` for a fix, `minor` for something new on screen, `major` for a rework. The script keeps the page, `version.json` and `changelog.json` in step. The update section itself is `updates.js`, shared by all the apps.
+
+## Sync between devices
+
+`sync.js` (the same file in every Gluminou app) copies this app's data between devices through `data.json` in the private repo **Gluminou/piano-steps-data**: stars earned, tempo per piece, note names, step mode and the last piece opened. Each device connects once with a fine-grained GitHub key that has **Contents: Read and write** on that repo (**Read-only** gives view-only access). Paste the key in the **Sync between devices** section at the bottom of the page. On a computer the apps share one address, so a key entered in one app is offered to the others. Each app can still be disconnected on its own.
+
+Changes from two devices are merged item by item. When both devices changed the same thing, the latest change wins. The repo history keeps every version.

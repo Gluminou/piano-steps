@@ -1,8 +1,8 @@
 {
-  "v": "202611210445",
-  "version": "1.0.0",
-  "date": "2026-11-21",
+  "v": "202611260211",
+  "version": "1.1.0",
+  "date": "2026-11-26",
   "notes": [
-    "Check for update button, version number with its date, and this What's new list."
+    "Sync between devices: once a GitHub key is entered, stars, tempos and settings follow you between the iPad, the phone and the computer."
   ]
 }
