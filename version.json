@@ -1,8 +1,8 @@
 {
-  "v": "202611260211",
-  "version": "1.1.0",
+  "v": "202611260257",
+  "version": "1.1.1",
   "date": "2026-11-26",
   "notes": [
-    "Sync between devices: once a GitHub key is entered, stars, tempos and settings follow you between the iPad, the phone and the computer."
+    "Home-screen icon and name of its own (add the app to the home screen again to see the new icon); shared sync and update files brought in line with all the other apps."
   ]
 }

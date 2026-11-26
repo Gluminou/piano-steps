@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.1",
+    "date": "2026-11-26",
+    "notes": [
+      "Home-screen icon and name of its own (add the app to the home screen again to see the new icon); shared sync and update files brought in line with all the other apps."
+    ]
+  },
+  {
     "version": "1.1.0",
     "date": "2026-11-26",
     "notes": [
