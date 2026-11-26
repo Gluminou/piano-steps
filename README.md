@@ -4,17 +4,17 @@ Piano practice app: shows which key and finger to press, note by note, for piece
 
 Live at https://gluminou.github.io/piano-steps/
 
-## How songs update
+## Where the songs are
 
-The songs live in `songs.json`. The app downloads it fresh every time it opens (and when you come back to it), so a shortcut on the phone's home screen picks up new songs by itself. `index.html` also keeps a built-in copy, used only when the phone is offline.
-
-The header shows "My songs (N)". When a new song is added, that number goes up on the next open.
+Not in this public repo. The songs live in the private repo **Gluminou/piano-steps-data**, in `songs.src.js`, and the app gets them through `sync.js` once the device is connected with a key. Without a key it shows only the key screen. When a song is added, connected devices reload with it by themselves. The header shows "My songs (N)".
 
 ## Adding a song
 
-1. Add the piece to the list between `/*SONGS-START` and `/*SONGS-END*/` in `index.html`.
-2. Run `node build-songs.js` to rebuild `songs.json`. It also checks that every bar adds up to 4 beats.
-3. Commit both files.
+In the private repo (adjust the path to this repo):
+
+1. Add the piece to the list between `/*SONGS-START*/` and `/*SONGS-END*/` in `songs.src.js`.
+2. `node ../piano-steps/build-songs.js songs.src.js songs.json` rebuilds `songs.json` and checks that every bar adds up to 4 beats.
+3. `node ../piano-steps/tools/content.mjs put songs.json data.json piano-songs`, then commit and push the private repo.
 
 ## Versions
 

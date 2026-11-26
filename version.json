@@ -1,8 +1,8 @@
 {
-  "v": "202611260257",
-  "version": "1.1.1",
+  "v": "202611260452",
+  "version": "1.2.0",
   "date": "2026-11-26",
   "notes": [
-    "Home-screen icon and name of its own (add the app to the home screen again to see the new icon); shared sync and update files brought in line with all the other apps."
+    "The app now asks for a key: the songs are no longer public and arrive from the private repo once the device is connected."
   ]
 }

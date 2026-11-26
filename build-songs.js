@@ -1,7 +1,7 @@
-// Rebuilds songs.json from the song list written in index.html.
-// Usage: node build-songs.js [path/to/index.html] [path/to/songs.json]
+// Rebuilds songs.json from the song list in songs.src.js (private repo Gluminou/piano-steps-data).
+// Usage: node build-songs.js <songs.src.js> <songs.json>
 const fs=require('fs'),vm=require('vm');
-const src=process.argv[2]||'index.html',out=process.argv[3]||'songs.json';
+const src=process.argv[2],out=process.argv[3];if(!src||!out)throw new Error('Usage: node build-songs.js <songs.src.js> <songs.json>');
 const html=fs.readFileSync(src,'utf8');
 const a=html.indexOf('/*SONGS-START'),b=html.indexOf('/*SONGS-END*/');
 if(a<0||b<0)throw new Error('Song markers not found in '+src);

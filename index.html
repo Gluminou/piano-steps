@@ -246,81 +246,11 @@ body.step #next{flex:1 1 200px;justify-content:center;font-size:24px;padding:18p
 </div>
 
 <script>
-/*SONGS-START: built-in copy, used offline. The live list comes from songs.json */
-const N=(n,b,h,f,w,bar)=>({n,b,h,f,w,bar});
-const R=(b,bar,w='')=>({n:null,b,w,bar});
-const K=(keys,b,w,bar)=>({n:keys[0][0],keys:keys.map(([n,h,f])=>({n,h,f})),b,w,bar});
-const LC=[['A3','L',3],['C4','L',1]], LF=[['F3','L',3],['A3','L',1]], B7=[['B3','L',2],['D4','R',2],['E4','R',3]];
-const PIECES=[
- {id:'tango',number:55,title:'Tango',mark:'Rhythmically',time:'4/4',position:'Middle C position',bpm:70,staccato:true,wordLabel:'Count',
-  lines:[{label:'Line 1',bars:[1,2,3,4]},{label:'Line 2',bars:[5,6,7,8]}],
-  notes:[
-   K(LC,1,'1',1),K(LC,1,'2',1),R(1,1,'3'),K(LC,1,'4',1),
-   K(LC,1,'1',2),R(1,2,'2'),N('E4',1,'R',3,'3',2),R(1,2,'4'),
-   K(LF,1,'1',3),K(LF,1,'2',3),R(1,3,'3'),K(LF,1,'4',3),
-   K(LF,1,'1',4),R(1,4,'2'),N('D4',1,'R',2,'3',4),R(1,4,'4'),
-   K(LF,1,'1',5),K(LF,1,'2',5),R(1,5,'3'),K(LF,1,'4',5),
-   K(LF,1,'1',6),R(1,6,'2'),N('C4',1,'R',1,'3',6),R(1,6,'4'),
-   K(B7,1,'1',7),K(B7,1,'2',7),R(1,7,'3'),K(B7,1,'4',7),
-   K([['A3','L',3],['C4','R',1],['E4','R',3]],1,'1',8),R(3,8,'2 3 4')
-  ],
-  tips:[
-   '<b>Tango is a dance for two people</b> from Argentina and Uruguay. It sounds sharp and jumpy, like dancers stepping and stopping.',
-   '<b>Play 2 keys at the same time.</b> Most notes here are pairs of keys. Press both together, as if they were one key. In the app, tap both keys (one after the other is fine) to move on.',
-   '<b>Every note is short and strong.</b> The dot means staccato: bounce off the key quickly. The &gt; means accent: play it a bit louder.',
-   '<b>The rests are part of the dance.</b> Your teacher boxed them in pencil. Keep counting "1 2 3 4" out loud, and stay silent on the rests. Silence on beat 3 is what makes it sound like a tango.',
-   '<b>Bars 1 and 2:</b> left hand plays A and C together (fingers 3 and 1). The right hand answers with one E (finger 3) on beat 3.',
-   '<b>Bar 3: the left hand moves down.</b> The pink circle in the book means a new hand position. Thumb on A, finger 3 on F. Use the rest at the end of bar 2 to move.',
-   '<b>Bar 7: both hands play together.</b> Right hand D and E (fingers 2 and 3), left hand B (finger 2). Your left thumb is back on Middle C.',
-   '<b>The last note is three keys:</b> right hand C and E, left hand A. Then three beats of silence. Freeze like a dancer at the end!'
-  ]},
- {id:'sailor-went-to-sea',number:53,title:'A Sailor Went to Sea',mark:'Quite fast',time:'4/4',position:'Middle C position',bpm:80,
-  lines:[{label:'Line 1',bars:[1,2,3,4,5]},{label:'Line 2',bars:[6,7,8,9]}],
-  notes:[
-   R(2,1),N('C4',2,'L',1,'A',1),
-   N('F3',1,'L',5,'sail-',2),N('F3',1,'L',5,'or',2),N('A3',1,'L',3,'went',2),N('A3',1,'L',3,'to',2),
-   N('C4',2,'L',1,'sea',3),N('C4',2,'R',1,'To',3),
-   N('F4',1,'R',4,'see',4),N('F4',1,'R',4,'what',4),N('D4',1,'R',2,'he',4),N('D4',1,'R',2,'could',4),
-   N('C4',2,'R',1,'see,',5),N('C4',2,'L',1,'But',5),
-   N('F3',1,'L',5,'all',6),N('F3',1,'L',5,'that',6),N('A3',1,'L',3,'he',6),N('A3',1,'L',3,'could',6),
-   N('C4',2,'L',1,'see',7),N('C4',1,'R',1,'was',7),N('C4',1,'R',1,'the',7),
-   N('D4',1,'R',2,'bot-',8),N('D4',1,'R',2,'tom',8),N('E4',1,'R',3,'of',8),N('E4',1,'R',3,'the',8),
-   N('F4',2,'R',4,'sea!',9),R(2,9)
-  ],
-  tips:[
-   '<b>Same Middle C position as before.</b> Left hand fingers 5 4 3 2 1 on F G A B C, right hand fingers 1 2 3 4 5 on C D E F G. Your hands never move.',
-   '<b>Wait before you start.</b> Bar 1 begins with 2 beats of silence. Count "1, 2" quietly, then play "A" on beat 3.',
-   '<b>Only one hand plays at a time.</b> The hands take turns, like two sailors passing a rope.',
-   '<b>Both thumbs share Middle C.</b> In bar 3, the left thumb plays "sea", then the right thumb plays "To" on the same key. Lift the left thumb as the right one comes down. Same in bars 5 and 7.',
-   '<b>The left hand pattern comes twice:</b> C, then F F A A (fingers 1, 5 5 3 3). Learn it once, use it twice.',
-   '<b>The right hand jumps over a key:</b> F F D D (fingers 4 4 2 2). Skip E on the way down.',
-   '<b>The ending climbs like a wave:</b> C C D D E E F (fingers 1 1 2 2 3 3 4). Hold the last F for 2 beats.',
-   '<b>"Quite fast" comes last.</b> Learn it slowly first, then move the speed up a little each day.'
-  ]},
- {id:'letters-and-solfa',number:54,title:'Letters and Solfa',mark:'Smoothly',time:'4/4',position:'Middle C position',bpm:66,
-  lines:[{label:'Line 1 · letters',bars:[1,2,3,4]},{label:'Line 2 · solfa',bars:[5,6,7,8]}],
-  notes:[
-   N('A3',1,'L',3,'A',1),N('B3',1,'L',2,'B',1),N('C4',1,'R',1,'C',1),N('D4',1,'R',2,'D',1),
-   N('E4',1,'R',3,'E',2),N('F4',1,'R',4,'F',2),N('G4',2,'R',5,'G',2),
-   N('F4',1,'R',4,'Mu',3),N('E4',1,'R',3,'sic',3),N('D4',1,'R',2,'al',3),N('C4',1,'R',1,'pha',3),
-   N('B3',1,'L',2,'bet,',4),N('A3',1,'L',3,'you',4),N('G3',2,'L',4,'see!',4),
-   N('G4',1,'R',5,'So',5),N('F4',1,'R',4,'fa',5),N('E4',1,'R',3,'mi',5),N('D4',1,'R',2,'re',5),
-   N('C4',1,'L',1,'do',6),N('B3',1,'L',2,'ti',6),N('A3',1,'L',3,'la,',6),N('G3',1,'L',4,'and',6),
-   N('F3',1,'L',5,'now',7),N('G3',1,'L',4,'we',7),N('A3',1,'L',3,'sing',7),N('B3',1,'L',2,'our',7),
-   N('C4',1,'R',1,'sol',8),N('D4',1,'R',2,'fa',8),N('C4',2,'R',1,'song.',8)
-  ],
-  tips:[
-   '<b>Middle C position.</b> Both thumbs share Middle C. Left hand fingers 5 4 3 2 1 sit on F G A B C. Right hand fingers 1 2 3 4 5 sit on C D E F G. Every note of this piece is under a finger, so your hands never move.',
-   '<b>Line 1 is the musical alphabet.</b> It walks up A B C D E F G, then walks back down. There are only 7 letters: after G, the alphabet starts again at A.',
-   '<b>Pass the tune between hands.</b> Left hand plays A and B, then the right thumb takes over on C. Make the handover so smooth it sounds like one hand.',
-   '<b>White notes with a stem last 2 beats.</b> Hold G at the end of bars 2 and 4, and the last C. Count "1 2 3 4" in every bar.',
-   '<b>Line 2 is the same idea in solfa.</b> So fa mi re do ti la so. On this page, do is always C.',
-   '<b>In bar 6 the left thumb plays do (C).</b> The right hand has just finished on D, so let the left hand catch the tune.',
-   '<b>Bar 7 starts low, on F.</b> That is left-hand finger 5 (the F your teacher wrote). Climb F G A B, then the right thumb finishes on C.',
-   '<b>"Smoothly" means legato.</b> Let each key come up just as the next one goes down. No gaps, no bumps.'
-  ]}
-];
-/*SONGS-END*/
+/* The songs are not in this public page. They live in the private repo Gluminou/piano-steps-data
+   (songs.src.js, built into songs.json and stored under "piano-songs" in its data.json), and
+   sync.js brings them to devices connected with a key. Without one, only the key screen shows. */
+const SONGS=(()=>{try{return JSON.parse(localStorage.getItem('piano-songs'))}catch(e){return null}})();
+const PIECES=SONGS&&Array.isArray(SONGS.pieces)?SONGS.pieces:[];
 
 const LETTERS=['C','D','E','F','G','A','B'];
 const SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
@@ -488,41 +418,26 @@ function loadPiece(p){stop();piece=p;idx=firstPlay();store.set('pianoSteps.piece
 
 function prepSongs(){PIECES.forEach(p=>p.notes.forEach(n=>{if(n.n&&!n.keys)n.keys=[{n:n.n,h:n.h,f:n.f}]}));PIECES.sort((a,b)=>a.number-b.number)}
 prepSongs();
-/* Fetch the latest songs on every open, so a home-screen shortcut picks up new songs without being re-added. */
-let songsSig='';
-async function refreshSongs(){
- try{
-  const r=await fetch('songs.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
-  const txt=await r.text();if(txt===songsSig)return;const d=JSON.parse(txt);
-  if(!d||!Array.isArray(d.pieces)||!d.pieces.length||!d.pieces.every(p=>p.id&&Array.isArray(p.notes)))return;
-  songsSig=txt;
-  const curId=piece.id,keep=idx;
-  PIECES.splice(0,PIECES.length,...d.pieces);prepSongs();
-  if(running){piece=PIECES.find(x=>x.id===curId)||piece;buildShelf();return}
-  const p=PIECES.find(x=>x.id===curId)||PIECES[0];
-  loadPiece(p);if(p.id===curId&&keep<p.notes.length&&p.notes[keep].n){idx=keep;update()}
- }catch(e){}
-}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshSongs()});
 function buildShelf(){const el=$('shelf');$('libTitle').textContent=`My songs (${PIECES.length})`;
  el.innerHTML=PIECES.map((p,i)=>{const s=store.get('pianoSteps.stars.'+p.id,0);
   return `<button class="song" data-i="${i}" aria-current="${p===piece}"><span class="sn">${p.number}</span><span class="sx"><span class="st">${p.title}</span><span class="ss">${s?'★ '+s+' · ':''}${p.notes.filter(n=>n.n).length} notes</span></span></button>`}).join('');
  el.querySelectorAll('.song').forEach(b=>b.onclick=()=>{const p=PIECES[+b.dataset.i];if(p!==piece){loadPiece(p);if(stepMode)setStep(true,true)}})}
 mode=store.get('pianoSteps.mode','letter');
+if(PIECES.length){ // without the songs (no key yet), sync.js shows the key screen
 const lastId=store.get('pianoSteps.piece',PIECES[0].id);const startI=Math.max(0,PIECES.findIndex(p=>p.id===lastId));
 loadPiece(PIECES[startI]);setMode(mode);setStep(store.get('pianoSteps.step',false),false);
-refreshSongs();
+}
 </script>
 
 <script>
-const APP_RELEASE="1.1.1";
+const APP_RELEASE="1.2.0";
 const APP_DATE="2026-11-26";
-const APP_VERSION="202611260257";
+const APP_VERSION="202611260452";
 </script>
 <script>
 // Synced between devices through the private repo Gluminou/piano-steps-data (see sync.js):
 // stars earned, tempo per piece, note names, step mode and the last piece opened.
-const APP_SYNC={app:"piano-steps",prefixes:["pianoSteps."]};
+const APP_SYNC={app:"piano-steps",prefixes:["pianoSteps."],content:"piano-songs"};
 // Something changed on another device: show it here, without switching the piece being played.
 window.addEventListener('storage',e=>{
   const k=e.key||''; if(!k.startsWith('pianoSteps.')) return;
